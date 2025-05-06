@@ -175,3 +175,4 @@ cython_debug/
 
 # Jelle Custom settings
 .vscode/
+og-model/
