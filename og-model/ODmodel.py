@@ -15,28 +15,56 @@ import copy
 def OD(G,N,opinions,values,simstr,nrtime,dist_removelink,prob_removelink,tries_createlink,
        maxnb,dist_createlink,prob_createlink,tries_valuechange,rate_valuechange,
        tries_opinionchange,stubbornness,persuasiveness,distcd,T,create_plot_network):
-    
-    """ function that performs one opinion dynamics simulation with
-    G: initial np matrix with links between agents
-    N: number of agents
-    values: a value for every agent (between -1 and 1)
-    simstr: string to find back the plots
-    nrtime: length of simulation
-    dist_removelink: maximum distance to maintain a link
-    prob_removelink: the probability of removing a link with an opinion that is further than dist_removelink away
-    tries_createlink: number of times an agent may try to create a new link
-    maxnb: maximum number of niehgbors
-    dist_createlink: The maximum opinion distance to create a new link
-    prob_createlink: probbility of creating a new link if opinion is within dist_createlink
-    tries_valuechange: number of agents that may update their value
-    rate_valuechange: rate in which agents update their value towards their neighbors
-    tries_opinionchange: number of agents that may update their opinion
-    stubbornness: the stubbornness of every agent
-    persuasiveness: the persuasiveness of every agent
-    distcd: distance for the cognitivie dissonance process to work
-    T: temperature (stochasticity in opinion updating procedure)
-    create_plot_network: function to plot the network and save the fig
     """
+	Function to simulate the opinion dynamics model with network evolution.
+	----------
+	G : numpy.ndarray
+		Adjacency matrix of the network.
+	N : int
+		Number of agents.
+		Opinions of the agents.
+		Values of the agents.
+	simstr : str
+		String to identify the simulation.
+	nrtime : int
+		Number of iterations for the simulation.
+	dist_removelink : float
+		Distance threshold for removing links.
+	prob_removelink : float
+		Probability of removing a link.
+	tries_createlink : int
+		Number of attempts to create a new link.
+	maxnb : int
+		Maximum number of neighbors for each agent.
+	dist_createlink : float
+		Distance threshold for creating a new link.
+	prob_createlink : float
+		Probability of creating a new link.
+	tries_valuechange : int
+		Number of attempts to change the value of an agent.
+	rate_valuechange : float
+		Rate of value change.
+	tries_opinionchange : int
+		Number of attempts to change the opinion of an agent.
+	stubbornness : numpy.ndarray
+		Stubbornness of each agent.
+	persuasiveness : numpy.ndarray
+		Persuasiveness of each agent.
+	distcd : float
+		Distance threshold for opinion change.
+	T : float
+		Temperature parameter for the opinion change.
+	Returns
+	----------
+	Opinions : numpy.ndarray
+		Final opinions of the agents.
+	G : numpy.ndarray
+		Final adjacency matrix of the network.
+	categories : int
+		Number of categories in the final opinions.
+	dist_opinions : numpy.ndarray
+		Distances of opinions over time.
+	"""
     
     titleplot= 'time = 0' 
     create_plot_network(G, N, opinions, -1, 1, titleplot, simstr, savef=True)

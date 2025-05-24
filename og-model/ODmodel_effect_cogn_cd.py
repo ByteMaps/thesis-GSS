@@ -30,7 +30,7 @@ def create_plot_network(G,N,opinions,vmin,vmax,figtitle,simstr,savef=False):
     nodesdraw = nx.draw_networkx_nodes(G2, pos, node_color=opinions, cmap=cmap, node_size=50, vmin=vmin, vmax=vmax)
     sm = plt.cm.ScalarMappable(cmap=cmap, norm=plt.Normalize(vmin = vmin, vmax=vmax))
     sm._A = []
-    plt.colorbar(sm)
+    plt.colorbar(sm, ax=plt.gca())
     plt.title(figtitle)
     if savef:
         plt.savefig('figs_cd/' + simstr + figtitle + '.png')
