@@ -1,22 +1,26 @@
 import mesa
-from mesa import Agent
+import numpy as np
 
 class Individual(mesa.Agent):
 	"""An agent within the opinion dynamics model."""
-	__slots__ = ["opinion", "values", "stubbornness", "persuasiveness"] 				# Prevent creating dynamic attributes & save RAM
+	__slots__ = ["opinion", "values", "dist_createlink", "dist_removelink", "linked_agents"] 		# Prevent creating dynamic attributes & save RAM
 
-	def __init__(self, unique_id, model):
-		super().__init__(unique_id, model)
+	def __init__(self, model, dist_createlink, dist_removelink):
+		super().__init__(model)
 
-		self.opinion = self.random.random(-1,1)
-		self.values = self.random.random(-1,1)
-		self.stubbornness = self.random.random(0,1)
-		self.persuasiveness = self.random.random(0,1)
+		self.opinion = round(self.random.uniform(-1,1),3)
+		self.dist_createlink = dist_createlink
+		self.dist_removelink = dist_removelink
 
-	def change_value(self, new_value):
-		"""Change the agent's value to a new value."""
-		pass
+		self.linked_agents = np.empty(model.num_agents)											# Initate array with zero links
 
-	def change_opinion(self, new_opinion):
-		"""Change the agent's opinion to a new opinion."""
-		pass
+	def	find_neighbours(self, agentset):
+		"""Find all candidates to form links with and connect to them"""
+		candidates = [neighbour.unique_id for neighbour in agentset if abs(neighbour.opinion - self.opinion) <= self.dist_createlink and neighbour.unique_id != self.unique_id]
+
+		return candidates
+	
+	def	form_links(self, candidates):
+		"""Run candidates through prob_createlink and tries_createlink to see if a connection can happen"""
+		for candidate in candidates:										# Add candidate to linked agents # TODO add prob_create and tries_create to it
+			self.linked_agents[candidate.unique_id] = candidate
