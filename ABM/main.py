@@ -2,7 +2,7 @@ from src.agent_class import Individual
 from src.model_class import OpinionDynamicsModel
 
 # ================ PARAMETERS ===================================
-N = 5
+N = 10
 
 dist_removelink = 0.6
 dist_createlink = 0.1
