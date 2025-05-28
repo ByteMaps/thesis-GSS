@@ -5,7 +5,7 @@ from src.model_class import OpinionDynamicsModel
 N = 10
 
 dist_removelink = 0.6
-dist_createlink = 0.1
+dist_createlink = 0.4
 
 # ================ PARAMETERS ===================================
 
