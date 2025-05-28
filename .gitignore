@@ -176,6 +176,5 @@ cython_debug/
 # Jelle Custom settings
 .vscode/
 og-model/
-.python-version
 testing/
 .pytest_cache/
