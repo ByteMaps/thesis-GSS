@@ -175,6 +175,14 @@ cython_debug/
 
 # Jelle Custom settings
 .vscode/
+**/*.png
 og-model/
 testing/
 .pytest_cache/
+
+Include/
+etc/
+.Lib/
+Scripts/
+share/
+pyvenv.cfg

@@ -1,8 +1,11 @@
+import numpy as np
+
 from src.agent_class import Individual
 from src.model_class import OpinionDynamicsModel
 from src.visualisation import form_edges, form_network, form_plot
 
 # ================ PARAMETERS ===================================
+
 N = 10
 
 dist_removelink = 0.6

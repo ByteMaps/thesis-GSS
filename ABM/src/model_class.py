@@ -7,11 +7,12 @@ class OpinionDynamicsModel(mesa.Model):
 		super().__init__()
 		self.num_agents = N
 		self.adj_matrix = np.zeros((N,N), dtype=float)					# Distances between agents ([0,2])
-		self.link_matrix = np.zeros((N,N), dtype=int)					# Links between agents (1,0)						
+		self.link_matrix = np.zeros((N,N), dtype=int)					# Links between agents (1,0)
+		self.opinions = np.random.rand(N)*2-1						
 
 		# Create agents
 		for id in range(self.num_agents):
-			agent = Agent(self, id, dist_createlink=dist_createlink, dist_removelink=dist_removelink)
+			agent = Agent(self, id, opinion=self.opinions[id], dist_createlink=dist_createlink, dist_removelink=dist_removelink)
 
 	def	run(self):
 		"""Run through all agents to test functionality"""
@@ -24,5 +25,6 @@ class OpinionDynamicsModel(mesa.Model):
 		"""Create a plot based on a single model run"""
 		edges = form_edges(self.num_agents, self.adj_matrix)
 		pos, cmap, G2 = form_network(self.num_agents, edges)
+		opinions = [agent.opinion for agent in self._agents]
 
-		form_plot(self.num_agents, self.agents.opinion, edges, cmap, G2, pos)			# TODO error AgentSet has no attribute 'opinion'
+		form_plot(self.num_agents, opinions, edges, cmap, G2, pos)			# TODO error AgentSet has no attribute 'opinion'
