@@ -1,6 +1,5 @@
 import mesa
 import numpy as np
-import visualisation as viz
 
 class OpinionDynamicsModel(mesa.Model):
 	"""A model with some number of agents."""
@@ -21,9 +20,9 @@ class OpinionDynamicsModel(mesa.Model):
 		print(self.adj_matrix)
 		print(self.link_matrix)
 
-	def	create_plot(self):
+	def	create_plot(self, form_edges, form_network, form_plot):
 		"""Create a plot based on a single model run"""
-		edges = viz.form_edges(self.num_agents, self.adj_matrix)
-		pos, cmap, G2 = viz.form_network(self.num_agents, edges)
+		edges = form_edges(self.num_agents, self.adj_matrix)
+		pos, cmap, G2 = form_network(self.num_agents, edges)
 
-		viz.form_plot(self.num_agents, self.agents.opinion, edges, cmap, G2, pos)
+		form_plot(self.num_agents, self.agents.opinion, edges, cmap, G2, pos)			# TODO error AgentSet has no attribute 'opinion'
