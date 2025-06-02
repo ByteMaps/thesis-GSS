@@ -12,3 +12,4 @@ dist_createlink = 0.4
 if __name__=="__main__":
 	model = OpinionDynamicsModel(N, Individual, dist_createlink, dist_removelink)
 	model.run()
+	model.create_plot()

@@ -1,40 +1,31 @@
 import numpy as np
 import networkx as nx
 import matplotlib.pyplot as plt
+from random import randint
 
 # TODO integrate code with model runs
 
-def	form_adjacency_matrix(agent_links, N):
-	"""Form the adjacency matrix for the agents in the model using the linked neighbour arrays"""
-
-	adjacency_matrix = np.eye(N)
-
-	for i in range(N):
-		for j in range(N):
-			if j in agent_links[i]:
-				adjacency_matrix[i, j] = 1
-			else:
-				adjacency_matrix[i, j] = 0
-
-	return adjacency_matrix
-
-def	form_edges(N, G, adj_matrix):
+def	form_edges(N, adj_matrix):
+	"""Create a list of edges for linked agents"""
 	edges=[]
-	# Create a list of edges from the adjacency matrix
 	for i in range(N):
 		for j in range(i):
-			if G[i,j]==1:
+			if adj_matrix[i,j]==1:
 				edges.append((i,j))
 
 	return edges
 
-def	form_plot(edges):											# TODO sort out this code, comments & subtasks
-	cmap = plt.cm.viridis # plt.cm.hot #
+def	form_network(N, edges):
+	"""Set up the networkx graph for plotting, use theme viridis"""
+	cmap = plt.cm.viridis
 	G2 = nx.Graph()
 	G2.add_nodes_from(np.arange(0,N))
 	G2.add_edges_from(edges)
 	pos = nx.spring_layout(G2,seed=10)
+	return pos, cmap, G2
 
+def	form_plot(N, opinions, edges, cmap, G2, pos, vmin=-1, vmax=1, savef=False):
+	"""Build the plot using matplotlib"""
 	plt.figure()
 	edgesdraw = nx.draw_networkx_edges(G2, pos, alpha=0.4)
 	nodesdraw = nx.draw_networkx_nodes(G2, pos, node_color=opinions, cmap=cmap, node_size=50, vmin=vmin, vmax=vmax)
@@ -42,3 +33,5 @@ def	form_plot(edges):											# TODO sort out this code, comments & subtasks
 	sm._A = []
 	cbar = plt.colorbar(sm, ax=plt.gca())
 	cbar.ax.tick_params(labelsize=15)
+	if savef:
+		plt.savefig("figures/%i.png", i=randint(0,100))

@@ -1,5 +1,6 @@
 import mesa
 import numpy as np
+import utils.visualisation as viz
 
 class OpinionDynamicsModel(mesa.Model):
 	"""A model with some number of agents."""
@@ -19,3 +20,10 @@ class OpinionDynamicsModel(mesa.Model):
 		self.agents.shuffle_do("find_neighbours", self.agents)
 		print(self.adj_matrix)
 		print(self.link_matrix)
+
+	def	create_plot(self):
+		"""Create a plot based on a single model run"""
+		edges = viz.form_edges(self.num_agents, self.adj_matrix)
+		pos, cmap, G2 = viz.form_network(self.num_agents, edges)
+
+		viz.form_plot(self.num_agents, self.agents.opinion, edges, cmap, G2, pos)
