@@ -1,6 +1,6 @@
 import mesa
 import numpy as np
-import utils.visualisation as viz
+import visualisation as viz
 
 class OpinionDynamicsModel(mesa.Model):
 	"""A model with some number of agents."""

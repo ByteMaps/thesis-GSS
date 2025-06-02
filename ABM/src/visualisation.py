@@ -24,14 +24,14 @@ def	form_network(N, edges):
 	pos = nx.spring_layout(G2,seed=10)
 	return pos, cmap, G2
 
-def	form_plot(N, opinions, edges, cmap, G2, pos, vmin=-1, vmax=1, savef=False):
-	"""Build the plot using matplotlib"""
-	plt.figure()
-	edgesdraw = nx.draw_networkx_edges(G2, pos, alpha=0.4)
-	nodesdraw = nx.draw_networkx_nodes(G2, pos, node_color=opinions, cmap=cmap, node_size=50, vmin=vmin, vmax=vmax)
-	sm = plt.cm.ScalarMappable(cmap=cmap, norm=plt.Normalize(vmin = vmin, vmax=vmax))
-	sm._A = []
-	cbar = plt.colorbar(sm, ax=plt.gca())
-	cbar.ax.tick_params(labelsize=15)
-	if savef:
-		plt.savefig("figures/%i.png", i=randint(0,100))
+def form_plot(N, opinions, edges, cmap, G2, pos, vmin=-1, vmax=1, savef=False):
+    """Build the plot using matplotlib"""
+    plt.figure()
+    edgesdraw = nx.draw_networkx_edges(G2, pos, alpha=0.4)
+    nodesdraw = nx.draw_networkx_nodes(G2, pos, node_color=opinions, cmap=cmap, node_size=50, vmin=vmin, vmax=vmax)
+    sm = plt.cm.ScalarMappable(cmap=cmap, norm=plt.Normalize(vmin=vmin, vmax=vmax))
+    sm._A = []
+    cbar = plt.colorbar(sm, ax=plt.gca())
+    cbar.ax.tick_params(labelsize=15)
+    if savef:
+        plt.savefig(f"figures/{randint(0, 100)}.png")
