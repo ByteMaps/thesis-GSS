@@ -4,16 +4,13 @@ import matplotlib.pyplot as plt
 from random import randint
 from os import makedirs
 
-# TODO integrate code with model runs
-
-def	form_edges(N, adj_matrix):
+def	form_edges(N, linked_matrix):
 	"""Create a list of edges for linked agents"""
 	edges=[]
 	for i in range(N):
 		for j in range(i):
-			if adj_matrix[i,j]==1:
+			if linked_matrix[i,j]==1:
 				edges.append((i,j))
-
 	return edges
 
 def	form_network(N, edges):
@@ -25,11 +22,11 @@ def	form_network(N, edges):
 	pos = nx.spring_layout(G2,seed=10)
 	return pos, cmap, G2
 
-def form_plot(N, opinions, edges, cmap, G2, pos, vmin=-1, vmax=1, savef=False):
+def form_plot(N, opinions, cmap, G2, pos, vmin=-1, vmax=1, savef=False):
 	"""Build the plot using matplotlib"""
 	plt.figure()
-	edgesdraw = nx.draw_networkx_edges(G2, pos, alpha=0.4)
-	nodesdraw = nx.draw_networkx_nodes(G2, pos, node_color=opinions, cmap=cmap, node_size=50, vmin=vmin, vmax=vmax)
+	nx.draw_networkx_edges(G2, pos, alpha=0.4)
+	nx.draw_networkx_nodes(G2, pos, node_color=opinions, cmap=cmap, node_size=50, vmin=vmin, vmax=vmax)
 	sm = plt.cm.ScalarMappable(cmap=cmap, norm=plt.Normalize(vmin=vmin, vmax=vmax))
 	sm._A = []
 	cbar = plt.colorbar(sm, ax=plt.gca())
