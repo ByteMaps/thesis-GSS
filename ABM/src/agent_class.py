@@ -5,13 +5,14 @@ class Individual(mesa.Agent):
 	"""An agent within the opinion dynamics model."""
 	__slots__ = ["opinion", "values", "dist_createlink", "dist_removelink", "linked_agents"] 		# Prevent creating dynamic attributes & save RAM
 
-	def __init__(self, model, unique_id, opinion, dist_createlink, dist_removelink):
+	def __init__(self, model, unique_id, opinion, values, dist_createlink, dist_removelink):
 		super().__init__(model)
 
 		self.unique_id = unique_id
 		self.link_row = model.link_matrix[self.unique_id]
 
 		self.opinion = opinion
+		self.values = values
 		self.dist_createlink = dist_createlink
 		self.dist_removelink = dist_removelink
 
@@ -36,5 +37,10 @@ class Individual(mesa.Agent):
 					agent.link_row[self.unique_id] = 0
 
 	def	change_opinion(self):
-		"""N"""
+		"""Change the opinion of the agent based on others"""
 		pass
+
+	def	change_values(self, tries_valuechange=10):
+		"""Change the values of the agent based on"""
+		neighbour_values = self.link_row * self.model.values
+		opti_val = sum(neighbour_values)/sum(abs(neighbour_values)>0)			# TODO finish

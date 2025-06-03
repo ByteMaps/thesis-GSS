@@ -8,12 +8,13 @@ class OpinionDynamicsModel(mesa.Model):
 		self.num_agents = N
 		self.link_matrix = np.zeros((N,N), dtype=int)					# Links between agents (1,0)
 		self.opinions = np.random.rand(N)*2-1
+		self.values = np.random.rand(N)*2-1
 
 		self.prob_removelink = 0.15					
 
 		# Create agents
 		for id in range(self.num_agents):
-			agent = Agent(self, id, opinion=self.opinions[id], dist_createlink=dist_createlink, dist_removelink=dist_removelink)
+			agent = Agent(self, id, self.opinions[id], self.values[id], dist_createlink, dist_removelink)
 
 	def	run(self):
 		"""Run through all agents to test functionality"""
