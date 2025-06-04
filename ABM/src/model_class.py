@@ -5,7 +5,8 @@ class OpinionDynamicsModel(mesa.Model):
 	"""A model with some number of agents."""
 	def __init__(self, N, Agent, params):
 		super().__init__()
-		self.num_agents = N
+		self.N = N
+		self.agents_by_id = {}
 
 		self.link_matrix = np.zeros((N,N), dtype=int)					# Links between agents (1,0)
 		self.opinions = np.random.rand(N)*2-1							# ? Why the * 2 - 1
@@ -24,8 +25,9 @@ class OpinionDynamicsModel(mesa.Model):
 		self.Temp				= params.Temp			
 
 		# Create agents
-		for id in range(self.num_agents):
+		for id in range(self.N):
 			agent = Agent(self, id, self.opinions[id], self.values[id], self.dist_createlink, self.dist_removelink)
+			self.agents_by_id[id] = agent
 
 	def	run(self):
 		"""Run through all agents to test functionality"""
@@ -35,7 +37,7 @@ class OpinionDynamicsModel(mesa.Model):
 
 	def	create_plot(self, form_edges, form_network, form_plot):
 		"""Create a plot based on a single model run"""
-		edges = form_edges(self.num_agents, self.link_matrix)
-		pos, cmap, G2 = form_network(self.num_agents, edges)
+		edges = form_edges(self.N, self.link_matrix)
+		pos, cmap, G2 = form_network(self.N, edges)
 
-		form_plot(self.num_agents, self.opinions, cmap, G2, pos)
+		form_plot(self.N, self.opinions, cmap, G2, pos)

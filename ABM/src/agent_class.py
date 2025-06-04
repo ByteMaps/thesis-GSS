@@ -5,6 +5,7 @@ from math import exp
 class Individual(mesa.Agent):
 	"""An agent within the opinion dynamics model."""
 	__slots__ = ["opinion", "values", "dist_createlink", "dist_removelink", "linked_agents"] 		# Prevent creating dynamic attributes & save RAM
+	# TODO update slots here and in model
 
 	def __init__(self, model, unique_id, opinion, values, dist_createlink, dist_removelink):
 		super().__init__(model)
@@ -25,16 +26,18 @@ class Individual(mesa.Agent):
 
 	def	find_neighbours(self, agentset):
 		"""Add to link_matrix row on distances"""
-		for agent in agentset:
-			agent_id = agent.unique_id
-			if agent_id != self.unique_id:
-				if (abs(agent.opinion - self.opinion) <= self.dist_createlink):
-					self.link_row[agent.unique_id] = 1
-					agent.link_row[self.unique_id] = 1
+		for i in range(self.model.tries_createlink):
+			if sum(self.link_row) < self.model.max_nb:
+				agent = self.model.agents_by_id[np.random.randint(0,self.model.N)]
+				agent_id = agent.unique_id
+				if agent_id != self.unique_id:
+					if (abs(agent.opinion - self.opinion) <= self.dist_createlink):
+						self.link_row[agent.unique_id] = 1
+						agent.link_row[self.unique_id] = 1
 
 	def	remove_neighbours(self, agentset):
 		"""Remove from link_matrix row on distances"""
-		removelink_random = np.random.uniform(0,1,self.model.num_agents)			# ? Why uniform? At step 4 it's random.rand
+		removelink_random = np.random.uniform(0,1,self.model.N)
 		for agent in agentset:
 			agent_id = agent.unique_id
 			if agent_id != self.unique_id:
@@ -63,7 +66,7 @@ class Individual(mesa.Agent):
 
 	def	change_values(self, rate_valuechange, tries_valuechange=10):
 		"""Change the values of the agent based on"""
-		for _ in range(tries_valuechange)									# ? Why is it just running through all of the tries?
+		for _ in range(tries_valuechange):									# ? Why is it just running through all of the tries?
 			neighbour_values = self.link_row * self.model.values
 			opt_val = sum(neighbour_values)/sum(abs(neighbour_values)>0)
 			dist = opt_val - self.values
