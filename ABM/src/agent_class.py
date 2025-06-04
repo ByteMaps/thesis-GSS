@@ -49,9 +49,9 @@ class Individual(mesa.Agent):
 		for i in range(tries_opinionchange):
 			if stub_random[i] < 1-self.stubbornness:
 				new_op = np.random.rand(1)*2-1
-				neighbour_ops = self.opinion * self.link_row
+				neighbour_ops = self.model.opinions * self.link_row					# ! improved to self.model.ops, check if correct
 				val_dist = abs(self.values - self.model.values)
-				val_signs = (self.link_row * [val_dist > distcd])[0]*2
+				val_signs = (self.link_row * (val_dist > distcd)).astype(int)*2		# ! review .astype error, maybe [] works still
 
 				E_old = sum(abs(val_signs - abs(self.opinion * self.link_row - neighbour_ops)) * self.persuasiveness)
 				E_new = sum(abs(val_signs - abs(new_op - neighbour_ops)) * self.persuasiveness)
@@ -67,7 +67,7 @@ class Individual(mesa.Agent):
 			neighbour_values = self.link_row * self.model.values
 			opt_val = sum(neighbour_values)/sum(abs(neighbour_values)>0)
 			dist = opt_val - self.values
-			self.values = values + rate_valuechange * dist
+			self.values = self.values + rate_valuechange * dist
 
 	# def	_update_neighbour_opinions(self):
 	# 	"""Updates the self neighbour array values"""
