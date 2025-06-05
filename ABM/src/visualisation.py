@@ -3,6 +3,10 @@ import networkx as nx
 import matplotlib.pyplot as plt
 from random import randint
 from os import makedirs
+from seaborn import kdeplot
+from scipy.signal import find_peaks
+
+# ================ NETWORK GRAPH =======================================
 
 def	form_edges(N, linked_matrix):
 	"""Create a list of edges for linked agents"""
@@ -22,7 +26,7 @@ def	form_network(N, edges):
 	pos = nx.spring_layout(G2,seed=10)
 	return pos, cmap, G2
 
-def form_netw_chart(N, opinions, cmap, G2, pos, vmin=-1, vmax=1, savef=False):
+def form_netw_chart(sim, model, N, opinions, cmap, G2, pos, vmin=-1, vmax=1, savef=True):
 	"""Build the plot using matplotlib"""
 	plt.figure()
 	nx.draw_networkx_edges(G2, pos, alpha=0.4)
@@ -32,7 +36,35 @@ def form_netw_chart(N, opinions, cmap, G2, pos, vmin=-1, vmax=1, savef=False):
 	cbar = plt.colorbar(sm, ax=plt.gca())
 	cbar.ax.tick_params(labelsize=15)
 	if savef:
-		makedirs('ABM/figures', exist_ok=True)
-		plt.savefig('ABM/figures/' + str(randint(0,100)) + '.png')
+		makedirs('ABM/results', exist_ok=True)
+		plt.savefig(f"ABM/results/mod_{model}-sim_{sim}.png")
 	else:
 		plt.show()
+
+# ====================== OP_DIST GRAPH ======================================
+
+def	form_density_estimate(opinions, sim, model):					# TODO integrate in code, save category
+	"""Build a kernel density plot based on the opinions data"""
+	plt.figure()
+	kde_plot = kdeplot(data=opinions)
+	plt.xlim(-1,1)
+	plt.xlabel('Opinions')
+	line = kde_plot.lines[0]
+	_, y = line.get_data()
+	amt_peaks = len(find_peaks(y, height=max(y)/10, prominence=0.1)[0])
+
+	category = assign_categories(amt_peaks, opinions)
+	plt.savefig(f"ABM/results/kde_plots/mod_{model}-sim_{sim}-cat_{category}.png")
+	plt.close('all')
+	return category
+
+def	assign_categories(amt_peaks, opinions):
+	if amt_peaks == 1:
+		if np.var(opinions) < 0.05:
+			return 0
+		else:
+			return 1
+	elif amt_peaks == 2:
+		return 2
+	else:
+		return 3

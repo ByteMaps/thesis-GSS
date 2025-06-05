@@ -1,6 +1,7 @@
 import mesa
 import numpy as np
 from scipy.stats import wasserstein_distance
+from src.visualisation import *
 
 class OpinionDynamicsModel(mesa.Model):
 	"""A model with some number of agents."""
@@ -8,8 +9,10 @@ class OpinionDynamicsModel(mesa.Model):
 		super().__init__()
 		self.N 					= N
 		self.agents_by_id 		= {}
-		self.opinion_dists 		= np.zeros(200)								# TODO remove hard-coded 200 if possible
+		self.opinion_dists 		= np.zeros(N)
 		self.opinion_dists[-1] 	= 1
+		self.sim 				= 0
+		self.model				= 0
 
 		self.link_matrix		= np.zeros((N,N), dtype=int)					# Links between agents (1,0)
 		self.opinions			= np.random.uniform(-1,1,N)
@@ -32,21 +35,36 @@ class OpinionDynamicsModel(mesa.Model):
 			agent = Agent(self, id, self.opinions[id], self.values[id], self.dist_createlink, self.dist_removelink)
 			self.agents_by_id[id] = agent
 
-	def	run(self):												# TODO add order, simulation end checks
-		"""Run through all agents to test functionality"""
-		step_opinions = np.copy(self.opinions)
-		self.agents.shuffle_do("find_neighbours", self._agents)
-		self.agents.shuffle_do("remove_neighbours", self._agents)
-		self.measure_op_dist(step_opinions)
 
-	def	visualise_network(self, form_edges, form_network, form_plot):
+	def	visualise_network(self, sim, model, opinions, Lmatrix):
 		"""Create a plot based on a single model run"""
-		edges = form_edges(self.N, self.link_matrix)
+		edges = form_edges(self.N, Lmatrix)
 		pos, cmap, G2 = form_network(self.N, edges)
 
-		form_plot(self.N, self.opinions, cmap, G2, pos)
+		form_netw_chart(sim, model, self.N, opinions, cmap, G2, pos)
 
 	def	measure_op_dist(self, step_opinions):
 		"""Record the opinion distances and measure using wasserstein_dist"""
 		self.opinion_dists[:-1] = self.opinion_dists[1::]		# Shift array for new recs
 		self.opinion_dists[-1] = wasserstein_distance(self.opinion_dists, step_opinions)
+
+
+	def	run(self, runtime, sim, model):												# TODO add order, simulation end checks
+		"""Run through all agents to test functionality"""
+		i = 0
+		# step_linkmat = self.link_matrix.copy()
+		# self.visualise_network(self.opinions, self.link_matrix)
+
+		while (not all(self.opinion_dists < 0.003) and i < runtime):
+			step_opinions = self.opinions.copy()
+
+			self.agents.shuffle_do("remove_neighbours", self._agents)
+			self.agents.shuffle_do("find_neighbours")
+			self.agents.shuffle_do("change_values", self.rate_valuechange, self.steps_valuechange)
+			self.agents.shuffle_do("change_opinion", self.Temp, self.dist_cd, self.tries_op_change)
+
+			self.measure_op_dist(step_opinions)
+			i += 1
+
+		self.visualise_network(sim, model, self.opinions, self.link_matrix)
+		form_density_estimate(self.opinions, sim, model)
