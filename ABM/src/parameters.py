@@ -6,8 +6,10 @@ class Parameters:
 		self.max_nb 				= 10
 		self.dist_createlink 		= 0.4
 		self.prob_createlink 		= 0.1
-		self.tries_valuechange 		= 10						# TODO change name?
+		self.steps_valuechange 		= 10						# TODO change name?
 		self.rate_valuechange 		= 0.05
 		self.tries_op_change		= 150
 		self.dist_cd				= 1
 		self.Temp					= 0.1
+
+		self.runtime				= 100

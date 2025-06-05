@@ -64,9 +64,9 @@ class Individual(mesa.Agent):
 				elif stub_random[i] < exp(-dH/T):
 					self.opinion = new_op
 
-	def	change_values(self, rate_valuechange, tries_valuechange=10):
+	def	change_values(self, rate_valuechange, steps_valuechange=10):
 		"""Change the values of the agent based on"""
-		for _ in range(tries_valuechange):									# ? Why is it just running through all of the tries?
+		for _ in range(steps_valuechange):									# ? Why is it just running through all of the tries?
 			neighbour_values = self.link_row * self.model.values
 			opt_val = sum(neighbour_values)/sum(abs(neighbour_values)>0)
 			dist = opt_val - self.values

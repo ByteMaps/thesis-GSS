@@ -22,7 +22,7 @@ def	form_network(N, edges):
 	pos = nx.spring_layout(G2,seed=10)
 	return pos, cmap, G2
 
-def form_plot(N, opinions, cmap, G2, pos, vmin=-1, vmax=1, savef=False):
+def form_netw_chart(N, opinions, cmap, G2, pos, vmin=-1, vmax=1, savef=False):
 	"""Build the plot using matplotlib"""
 	plt.figure()
 	nx.draw_networkx_edges(G2, pos, alpha=0.4)
