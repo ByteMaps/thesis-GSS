@@ -16,6 +16,6 @@ if __name__=="__main__":
 		for j in range(runs):
 			print(f"Model: {i}, Run: {j}")
 			model.run(params.runtime, j, i)
-			opinions[1,:,i] = model.opinions
+			opinions[j,:,i] = model.opinions			# TODO check if j instead of 1
 
 	np.save('ABM/results/control_OD_model_results', opinions)

@@ -44,19 +44,23 @@ def form_netw_chart(sim, model, N, opinions, cmap, G2, pos, vmin=-1, vmax=1, sav
 # ====================== OP_DIST GRAPH ======================================
 
 def	form_density_estimate(opinions, sim, model):					# TODO integrate in code, save category
-	"""Build a kernel density plot based on the opinions data"""
-	plt.figure()
-	kde_plot = kdeplot(data=opinions)
-	plt.xlim(-1,1)
-	plt.xlabel('Opinions')
-	line = kde_plot.lines[0]
-	_, y = line.get_data()
-	amt_peaks = len(find_peaks(y, height=max(y)/10, prominence=0.1)[0])
+ 	"""Build a kernel density plot based on the opinions data"""
+ 	plt.figure()
+ 	kde_plot = kdeplot(data=opinions)
+ 	plt.xlim(-1,1)
+ 	plt.xlabel('Opinions')
+ 	line = kde_plot.lines[0]
+ 	_, y = line.get_data()
+	amt_peaks = len(find_peaks(y, height=max(y)/10, prominence=0.1)[0])  # Consider making parameters configurable
 
-	category = assign_categories(amt_peaks, opinions)
-	plt.savefig(f"ABM/results/kde_plots/mod_{model}-sim_{sim}-cat_{category}.png")
-	plt.close('all')
-	return category
+ 	category = assign_categories(amt_peaks, opinions)
+	try:
+		makedirs('ABM/results/kde_plots', exist_ok=True)
+		plt.savefig(f"ABM/results/kde_plots/mod_{model}-sim_{sim}-cat_{category}.png")
+	except Exception as e:
+		print(f"Error saving KDE plot: {e}")
+	plt.close()  # Close only the current figure
+ 	return category
 
 def	assign_categories(amt_peaks, opinions):
 	if amt_peaks == 1:

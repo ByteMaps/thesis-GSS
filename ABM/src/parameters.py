@@ -14,4 +14,4 @@ class Parameters:
 		self.dist_cd				= 1
 		self.Temp					= 0.1
 
-		self.runtime				= 50
+		self.runtime				= 100

@@ -186,3 +186,4 @@ etc/
 Scripts/
 share/
 pyvenv.cfg
+results/
