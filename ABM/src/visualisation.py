@@ -26,7 +26,7 @@ def	form_network(N, edges):
 	pos = nx.spring_layout(G2,seed=10)
 	return pos, cmap, G2
 
-def form_netw_chart(sim, model, N, opinions, cmap, G2, pos, vmin=-1, vmax=1, savef=True):
+def form_netw_chart(sim, model, N, opinions, cmap, G2, pos, vmin=-1, vmax=1, savef=False):
 	"""Build the plot using matplotlib"""
 	plt.figure()
 	nx.draw_networkx_edges(G2, pos, alpha=0.4)
@@ -43,24 +43,28 @@ def form_netw_chart(sim, model, N, opinions, cmap, G2, pos, vmin=-1, vmax=1, sav
 
 # ====================== OP_DIST GRAPH ======================================
 
-def	form_density_estimate(opinions, sim, model):					# TODO integrate in code, save category
- 	"""Build a kernel density plot based on the opinions data"""
- 	plt.figure()
- 	kde_plot = kdeplot(data=opinions)
- 	plt.xlim(-1,1)
- 	plt.xlabel('Opinions')
- 	line = kde_plot.lines[0]
- 	_, y = line.get_data()
+def	form_density_estimate(opinions, sim, model, savef=False):					# TODO re-do peak analysis check og-model
+	"""Build a kernel density plot based on the opinions data"""
+	plt.figure()
+	kde_plot = kdeplot(data=opinions)
+	plt.xlim(-1,1)
+	plt.xlabel('Opinions')
+	line = kde_plot.lines[0]
+	_, y = line.get_data()
 	amt_peaks = len(find_peaks(y, height=max(y)/10, prominence=0.1)[0])  # Consider making parameters configurable
 
- 	category = assign_categories(amt_peaks, opinions)
-	try:
-		makedirs('ABM/results/kde_plots', exist_ok=True)
-		plt.savefig(f"ABM/results/kde_plots/mod_{model}-sim_{sim}-cat_{category}.png")
-	except Exception as e:
-		print(f"Error saving KDE plot: {e}")
+	category = assign_categories(amt_peaks, opinions)
+	plt.title(f"Cat {category}")
+	if savef:
+		try:
+			makedirs('ABM/results/kde_plots', exist_ok=True)
+			plt.savefig(f"ABM/results/kde_plots/mod_{model}-sim_{sim}-cat_{category}.png")
+		except Exception as e:
+			print(f"Error saving KDE plot: {e}")
+	else:
+		plt.show()
 	plt.close()  # Close only the current figure
- 	return category
+	return category
 
 def	assign_categories(amt_peaks, opinions):
 	if amt_peaks == 1:
@@ -72,3 +76,14 @@ def	assign_categories(amt_peaks, opinions):
 		return 2
 	else:
 		return 3
+	
+# =========== EXTRA ======================
+
+def	measure_opdist(opdist, runtime):
+	plt.figure()
+	plt.xlabel("timestep")
+	plt.ylabel("avg opinion distance")
+	y = [i for i in range(runtime)]
+	plt.plot(y, opdist)
+	plt.show()
+	

@@ -49,7 +49,7 @@ class Individual(mesa.Agent):
 
 	def	change_values(self, rate_valuechange, steps_valuechange):
 		"""Change the values of the agent based on"""
-		for _ in range(steps_valuechange):									# ? Why is it just running through all of the tries?
+		for _ in range(steps_valuechange):
 			neighbour_values = self.link_row * self.model.values
 			denom = sum(abs(neighbour_values) > 0)
 			if denom == 0:
@@ -59,7 +59,7 @@ class Individual(mesa.Agent):
 			dist = opt_val - self.values
 			self.values = self.values + rate_valuechange * dist
 
-	def	change_opinion(self, T, distcd, tries_opinionchange=10):					# TODO integrate with model
+	def	change_opinion(self, T, distcd, tries_opinionchange=10):
 		"""Change the opinion of the agent based on others"""
 		stub_random = np.random.uniform(0,1,tries_opinionchange)
 		for i in range(tries_opinionchange):

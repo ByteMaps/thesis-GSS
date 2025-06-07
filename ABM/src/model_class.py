@@ -14,7 +14,7 @@ class OpinionDynamicsModel(mesa.Model):
 		self.sim 				= 0
 		self.model				= 0
 
-		self.link_matrix		= np.zeros((N,N), dtype=int)					# Links between agents (1,0)
+		self.link_matrix		= np.zeros((N,N), dtype=int)	# TODO check if link_matrix, opinions and values are the same objects as in Agent class
 		self.opinions			= np.random.uniform(-1,1,N)
 		self.values				= np.random.uniform(-1,1,N)
 
@@ -52,6 +52,7 @@ class OpinionDynamicsModel(mesa.Model):
 	def	run(self, runtime, sim, model):												# TODO add order, simulation end checks
 		"""Run through all agents to test functionality"""
 		i = 0
+		opdist = [0 for _ in range(runtime)]
 		# step_linkmat = self.link_matrix.copy()
 		# self.visualise_network(self.opinions, self.link_matrix)
 
@@ -63,8 +64,14 @@ class OpinionDynamicsModel(mesa.Model):
 			self.agents.shuffle_do("change_values", self.rate_valuechange, self.steps_valuechange)
 			self.agents.shuffle_do("change_opinion", self.Temp, self.dist_cd, self.tries_op_change)
 
-			self.measure_op_dist(step_opinions)
+			# self.measure_op_dist(step_opinions)
+			op_std = round(self.opinions.std(), 4)
+			opdist[i] = op_std
+			op_eq = np.array_equal(step_opinions, self.opinions)
 			i += 1
+			if i % 5 == 0:
+				print(f"Running at {i} with {op_std} equal ops: {op_eq}")
 
+		measure_opdist(opdist, runtime)
 		self.visualise_network(sim, model, self.opinions, self.link_matrix)
 		form_density_estimate(self.opinions, sim, model)
