@@ -17,8 +17,6 @@ class Individual(mesa.Agent):
 		self.persuasiveness 	= persuasiveness
 
 		self.link_row 			= model.link_matrix[self.unique_id]
-		# self.neighbour_ops 	= self.link_row * self.opinion
-		# self.neighbour_dist 	= abs(self.opinion - self.neighbour_ops)
 
 	def	remove_neighbours(self, agentset):
 		"""Remove from link_matrix row on distances"""

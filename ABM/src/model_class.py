@@ -2,24 +2,24 @@ import mesa
 import numpy as np
 from scipy.stats import wasserstein_distance
 from src.visualisation import *
+from src.utils import *
 
 class OpinionDynamicsModel(mesa.Model):
 	"""A model with some number of agents."""
-	def __init__(self, N, Agent, params, runtime):
+	def __init__(self, N, Agent, params, runtime, model=0):
 		super().__init__()
 		self.N 					= N								# Amount of agents
-		self.sim 				= 0
-		self.model				= 0
+		self.modelrun			= model							# Model id
 		self.runtime			= runtime
 		self.modeltype			= type(params).__name__ 
+		self.link_matrix		= np.zeros((N,N), dtype=int)
 
-		self.link_matrix		= np.zeros((N,N), dtype=int)	# TODO check if link_matrix, opinions and values are the same objects as in Agent class
 		self.opinions			= np.random.uniform(-1,1,N)		# np array with generated opinions
 		self.values				= np.random.uniform(-1,1,N)		# np array with generated values
 		self.stubbornness		= np.random.rand(N)
 		self.persuasiveness		= np.random.rand(N)
 
-		# Imported parameters
+		# Base parameters
 		self.dist_removelink 	= params.dist_removelink
 		self.prob_removelink 	= params.prob_removelink
 		self.tries_createlink 	= params.tries_createlink
@@ -33,30 +33,19 @@ class OpinionDynamicsModel(mesa.Model):
 		self.Temp				= params.Temp
 
 		# GenT parameters
-		self.birth_death_prob    = params.birth_death_prob
-		self.turnover_tries      = params.turnover_tries
+		self.migration_prob    = params.migration_prob if self.modeltype == "GenT" else 0
+		self.turnover_tries    = params.turnover_tries if self.modeltype == "GenT" else 0
 
 		# Create agents
-		self.agents_by_id 		= {}							# Dict of agent objects accessible by unique_id
+		self.agents_by_id 		= {}									# Dict of agent objects accessible by unique_id
 		for id in range(self.N):
 			agent = Agent(self, id, self.opinions[id], self.values[id], self.stubbornness[id], self.persuasiveness[id])
 			self.agents_by_id[id] = agent
 
-		self.opinion_dists 		= np.zeros((N, self.runtime))
-		self.opinion_matrix		= np.zeros((N, self.runtime))
-		self.opinion_matrix[0]	= self.opinions
-
-	def	visualise_network(self, sim, model, opinions, Lmatrix):
-		"""Create a network plot based on a single model run"""
-		edges = form_edges(self.N, Lmatrix)
-		pos, cmap, G2 = form_network(self.N, edges)
-
-		form_netw_chart(sim, model, self.N, opinions, cmap, G2, pos)
-
-	def	measure_op_dist(self, step_opinions, step):
-		"""Record the opinion distances and measure using wasserstein_dist, save in opinion_dists"""
-		self.opinion_dists[:-1] = self.opinion_dists[1::]		# Shift array for new recs
-		self.opinion_dists[step] = wasserstein_distance(self.opinion_dists, step_opinions)
+		# Monitor matrices
+		self.opinion_dists 		= np.zeros(self.runtime + 1)			# array of wasserstein op dist
+		self.opinion_dists[-1]	= 1										# Circumvent main while loop first step
+		self.opinion_hist		= np.zeros((self.runtime + 1, N))		# 2D matrix of opinions over runtime
 
 	def	gen_turnover(self):
 		"""Pick out a random agent and reset its params"""			# * Hendrickx & Martin, 2017
@@ -74,29 +63,35 @@ class OpinionDynamicsModel(mesa.Model):
 			if np.random.rand() < self.migration_prob:
 				self.gen_turnover()
 
-	def	run(self, sim=0, model=0, test=False):
+	def	agents_shuffle(self):
+		"""Randomise model events for AgentSet"""
+
+		self.agents.shuffle_do("remove_neighbours", self._agents)
+		self.agents.shuffle_do("find_neighbours")
+		self.agents.shuffle_do("change_values", self.rate_valuechange, self.steps_valuechange)
+		self.agents.shuffle_do("change_opinion", self.Temp, self.dist_cd, self.tries_op_change)
+		for id, agent in self.agents_by_id.items():									# ? ugly, but looks like it works?
+			self.opinions[id] = agent.opinion
+
+	def	run(self):
 		"""Run through all agents to test functionality"""
 		i = 0
-		opdist = [0 for _ in range(self.runtime)]														# TODO see if still needed
-		self.visualise_network(self.sim, self.model, self.opinions, self.link_matrix)
+		# form_density_estimate(self.modeltype, self.opinions, self.model)
 
-		while (not all(self.opinion_dists < 0.003) and i < self.runtime):
-			step_opinions = self.opinions.copy()
-
-			self.agents.shuffle_do("remove_neighbours", self._agents)
-			self.agents.shuffle_do("find_neighbours")
-			self.agents.shuffle_do("change_values", self.rate_valuechange, self.steps_valuechange)
-			self.agents.shuffle_do("change_opinion", self.Temp, self.dist_cd, self.tries_op_change)
+		while (not(self.opinion_dists[i-1] < 0.003) and i < self.runtime):
+			self.opinion_hist[i] = self.opinions.copy()														# Update opinion matrix
+			self.opinion_dists[i] = round(wasserstein_distance(self.opinion_hist[i - 1], self.opinions),5)
+			
+			self.agents_shuffle()
 
 			# Generational turnover checks
 			if self.modeltype == "GenT":
 				self.turnover_check()
 
-			self.opinion_dists = 0		# TODO get the opinion distance from this step compared to the previous one
-
+			# print(f"Step {i} - dist: {self.opinion_dists[i]}, Opinion std: {round(np.std(self.opinions),5)}")
 			i += 1
-			if i % 5 == 0:
-				print(f"Running at {i}")
+			self.opinion_hist[i] = self.opinions
 
-		form_density_estimate(self.opinions, sim, model)
-		self.visualise_network(sim, model, self.opinions, self.link_matrix)
+		category = form_density_estimate(self.modeltype, self.opinions, self.modelrun, True)
+		visualise_network(self.modeltype, self.modelrun, self.N, self.opinions, self.link_matrix, category, True)
+		return category

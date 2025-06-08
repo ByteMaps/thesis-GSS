@@ -1,4 +1,4 @@
-class Parameters:
+class Base:
 	def	__init__(self):
 		self.dist_removelink 		= 0.6
 		self.prob_removelink 		= 0.1
@@ -15,9 +15,7 @@ class Parameters:
 		self.dist_cd				= 1
 		self.Temp					= 0.1
 
-		self.runtime				= 100
-
-class GenT(Parameters):
+class GenT(Base):
 	def	__init__(self):
 		super().__init__()
 		self.birth_death_prob		= 0					# Simulating life cycle effects

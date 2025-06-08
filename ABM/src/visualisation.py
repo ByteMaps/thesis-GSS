@@ -6,14 +6,16 @@ from os import makedirs
 from seaborn import kdeplot
 from scipy.signal import find_peaks
 
+from src.utils import *
+
 # ================ NETWORK GRAPH =======================================
 
-def	form_edges(N, linked_matrix):
+def	form_edges(N, link_matrix):
 	"""Create a list of edges for linked agents"""
 	edges=[]
 	for i in range(N):
 		for j in range(i):
-			if linked_matrix[i,j]==1:
+			if link_matrix[i,j]==1:
 				edges.append((i,j))
 	return edges
 
@@ -26,24 +28,31 @@ def	form_network(N, edges):
 	pos = nx.spring_layout(G2,seed=10)
 	return pos, cmap, G2
 
-def form_netw_chart(sim, model, N, opinions, cmap, G2, pos, vmin=-1, vmax=1, savef=False):
+def form_netw_chart(modeltype, model, N, category, opinions, cmap, G2, pos, savef):
 	"""Build the plot using matplotlib"""
 	plt.figure()
 	nx.draw_networkx_edges(G2, pos, alpha=0.4)
-	nx.draw_networkx_nodes(G2, pos, node_color=opinions, cmap=cmap, node_size=50, vmin=vmin, vmax=vmax)
-	sm = plt.cm.ScalarMappable(cmap=cmap, norm=plt.Normalize(vmin=vmin, vmax=vmax))
+	nx.draw_networkx_nodes(G2, pos, node_color=opinions, cmap=cmap, node_size=50, vmin=-1, vmax=1)
+	sm = plt.cm.ScalarMappable(cmap=cmap, norm=plt.Normalize(vmin=-1, vmax=1))
 	sm._A = []
 	cbar = plt.colorbar(sm, ax=plt.gca())
 	cbar.ax.tick_params(labelsize=15)
 	if savef:
-		makedirs('ABM/results', exist_ok=True)
-		plt.savefig(f"ABM/results/mod_{model}-sim_{sim}.png")
+		makedirs('ABM/results/networkx', exist_ok=True)
+		plt.savefig(f"ABM/results/networkx/{modeltype}_{model}-cat_{category}.png")
 	else:
 		plt.show()
 
+def	visualise_network(modeltype, model, N, opinions, link_matrix, category, savef=False):
+	"""Create a network plot based on a single model run"""
+	edges = form_edges(N, link_matrix)
+	pos, cmap, G2 = form_network(N, edges)
+
+	form_netw_chart(modeltype, model, N, category, opinions, cmap, G2, pos, savef)
+
 # ====================== OP_DIST GRAPH ======================================
 
-def	form_density_estimate(opinions, sim, model, savef=False):					# TODO re-do peak analysis check og-model
+def	form_density_estimate(modeltype, opinions, model, savef=False):
 	"""Build a kernel density plot based on the opinions data"""
 	plt.figure()
 	kde_plot = kdeplot(data=opinions)
@@ -51,40 +60,14 @@ def	form_density_estimate(opinions, sim, model, savef=False):					# TODO re-do p
 	plt.xlabel('Opinions')
 	line = kde_plot.lines[0]
 	_, y = line.get_data()
-	amt_peaks = len(find_peaks(y, height=max(y)/10, prominence=0.1)[0])  # Consider making parameters configurable
+	amt_peaks = len(find_peaks(y, height=max(y)/10, prominence=0.1)[0])
 
 	category = assign_categories(amt_peaks, opinions)
 	plt.title(f"Cat {category}")
 	if savef:
-		try:
-			makedirs('ABM/results/kde_plots', exist_ok=True)
-			plt.savefig(f"ABM/results/kde_plots/mod_{model}-sim_{sim}-cat_{category}.png")
-		except Exception as e:
-			print(f"Error saving KDE plot: {e}")
+		makedirs('ABM/results/kde_plots', exist_ok=True)
+		plt.savefig(f"ABM/results/kde_plots/{modeltype}_{model}-cat_{category}.png")
 	else:
 		plt.show()
-	plt.close()  # Close only the current figure
+	plt.close()
 	return category
-
-def	assign_categories(amt_peaks, opinions):
-	if amt_peaks == 1:
-		if np.var(opinions) < 0.05:
-			return 0
-		else:
-			return 1
-	elif amt_peaks == 2:
-		return 2
-	else:
-		return 3
-	
-# =========== EXTRA ======================
-
-def	measure_opdist(opdist, runtime):
-	"""Visualise the average opinion distance over time in a simple plot"""
-	plt.figure()
-	plt.xlabel("timestep")
-	plt.ylabel("avg opinion distance")
-	y = [i for i in range(runtime)]
-	plt.plot(y, opdist)
-	plt.show()
-	
