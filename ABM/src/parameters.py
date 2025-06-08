@@ -9,10 +9,21 @@ class Parameters:
 		self.dist_createlink 		= 0.2
 		self.prob_createlink 		= 0.1
 
-		self.steps_valuechange 		= 5			#10
+		self.steps_valuechange 		= 10
 		self.rate_valuechange 		= 0.05
 		self.tries_op_change		= 150
 		self.dist_cd				= 1
 		self.Temp					= 0.1
 
 		self.runtime				= 100
+
+class GenT(Parameters):
+	def	__init__(self):
+		super().__init__()
+		self.birth_death_prob		= 0					# Simulating life cycle effects
+		self.migration_prob			= 0					# Simulating migration effects
+		self.turnover_tries			= 5					# Amount of turnover tries
+
+if __name__=="__main__":
+	testparam = GenT()
+	print(testparam.max_nb)

@@ -1,21 +1,21 @@
 from src.agent_class import Individual
 from src.model_class import OpinionDynamicsModel
-from src.parameters import Parameters
+from src.parameters import Parameters, GenT
 import numpy as np
 
-N = 100
+N = 10
 runs = 15
 models = 10
 
 if __name__=="__main__":
 	print("Setting parameters")
-	params = Parameters()
+	params = GenT()
 	opinions = np.zeros((runs, N, models))
 
 	print("Initiating model")
 	model = OpinionDynamicsModel(N, Individual, params)
 	print("Running model")
-	model.run(params.runtime, 0, 0)
+	model.run(3, 0, 0)
 
 	# for i in range(models):
 	# 	model = OpinionDynamicsModel(N, Individual, params)

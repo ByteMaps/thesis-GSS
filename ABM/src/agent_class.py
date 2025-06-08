@@ -4,25 +4,21 @@ from math import exp
 
 class Individual(mesa.Agent):
 	"""An agent within the opinion dynamics model."""
-	__slots__ = ["opinion", "values", "dist_createlink", "dist_removelink", "linked_agents"] 		# Prevent creating dynamic attributes & save RAM
-	# TODO update slots here and in model
+	__slots__ = ["link_row", "opinion", "values", "stubbornness", "persuasiveness"] 		# Prevent creating dynamic attributes & save RAM
 
-	def __init__(self, model, unique_id, opinion, values, dist_createlink, dist_removelink):
+	def __init__(self, model, unique_id, opinion, values, stubbornness, persuasiveness):
 		super().__init__(model)
 
 		self.unique_id 			= unique_id
-		self.link_row 			= model.link_matrix[self.unique_id]
 
 		self.opinion 			= opinion
 		self.values 			= values
-		self.stubbornness 		= np.random.rand(1)
-		self.persuasiveness 	= np.random.rand(1)
+		self.stubbornness 		= stubbornness
+		self.persuasiveness 	= persuasiveness
 
+		self.link_row 			= model.link_matrix[self.unique_id]
 		# self.neighbour_ops 	= self.link_row * self.opinion
 		# self.neighbour_dist 	= abs(self.opinion - self.neighbour_ops)
-
-		self.dist_createlink	= dist_createlink
-		self.dist_removelink 	= dist_removelink
 
 	def	remove_neighbours(self, agentset):
 		"""Remove from link_matrix row on distances"""
@@ -30,7 +26,7 @@ class Individual(mesa.Agent):
 		for agent in agentset:
 			agent_id = agent.unique_id
 			if agent_id != self.unique_id:
-				if (abs(agent.opinion - self.opinion) >= self.dist_removelink) and \
+				if (abs(agent.opinion - self.opinion) >= self.model.dist_removelink) and \
 					(removelink_random[agent_id] <= self.model.prob_removelink):
 					self.link_row[agent.unique_id] = 0
 					agent.link_row[self.unique_id] = 0
@@ -42,7 +38,7 @@ class Individual(mesa.Agent):
 				agent = self.model.agents_by_id[np.random.randint(0,self.model.N)]
 				agent_id = agent.unique_id
 				if agent_id != self.unique_id:
-					if (abs(agent.opinion - self.opinion) <= self.dist_createlink):
+					if (abs(agent.opinion - self.opinion) <= self.model.dist_createlink):
 						self.link_row[agent.unique_id] = 1
 						agent.link_row[self.unique_id] = 1
 
