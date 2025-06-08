@@ -80,6 +80,7 @@ def	assign_categories(amt_peaks, opinions):
 # =========== EXTRA ======================
 
 def	measure_opdist(opdist, runtime):
+	"""Visualise the average opinion distance over time in a simple plot"""
 	plt.figure()
 	plt.xlabel("timestep")
 	plt.ylabel("avg opinion distance")

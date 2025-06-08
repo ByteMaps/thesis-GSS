@@ -4,18 +4,20 @@ from src.parameters import Parameters, GenT
 import numpy as np
 
 N = 10
+runtime = 3
 runs = 15
 models = 10
 
 if __name__=="__main__":
 	print("Setting parameters")
 	params = GenT()
-	opinions = np.zeros((runs, N, models))
+	# opinions = np.zeros((runs, N, models))
 
 	print("Initiating model")
-	model = OpinionDynamicsModel(N, Individual, params)
+	model = OpinionDynamicsModel(N, Individual, params, runtime)
 	print("Running model")
-	model.run(3, 0, 0)
+	print(model.modeltype)
+	model.run()
 
 	# for i in range(models):
 	# 	model = OpinionDynamicsModel(N, Individual, params)
