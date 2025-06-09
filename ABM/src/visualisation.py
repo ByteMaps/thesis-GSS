@@ -1,5 +1,7 @@
+import matplotlib.pyplot
 import numpy as np
 import networkx as nx
+import matplotlib
 import matplotlib.pyplot as plt
 from random import randint
 from os import makedirs
@@ -7,6 +9,8 @@ from seaborn import kdeplot
 from scipy.signal import find_peaks
 
 from src.utils import *
+
+matplotlib.use('Agg')
 
 # ================ NETWORK GRAPH =======================================
 
@@ -42,6 +46,7 @@ def form_netw_chart(modeltype, model, N, category, opinions, cmap, G2, pos, save
 		plt.savefig(f"ABM/results/networkx/{modeltype}_{model}-cat_{category}.png")
 	else:
 		plt.show()
+	plt.close('all')
 
 def	visualise_network(modeltype, model, N, opinions, link_matrix, category, savef=False):
 	"""Create a network plot based on a single model run"""
@@ -69,5 +74,5 @@ def	form_density_estimate(modeltype, opinions, model, savef=False):
 		plt.savefig(f"ABM/results/kde_plots/{modeltype}_{model}-cat_{category}.png")
 	else:
 		plt.show()
-	plt.close()
+	plt.close('all')
 	return category

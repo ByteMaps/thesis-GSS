@@ -18,7 +18,7 @@ class Individual(mesa.Agent):
 
 		self.link_row 			= model.link_matrix[self.unique_id]
 
-	def	remove_neighbours(self, agentset):
+	def	remove_neighbours(self, agentset):														# TODO error from coderabbit, review agentset use
 		"""Remove from link_matrix row on distances"""
 		removelink_random = np.random.uniform(0,1,self.model.N)
 		for agent in agentset:

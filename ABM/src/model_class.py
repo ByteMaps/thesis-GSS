@@ -44,7 +44,7 @@ class OpinionDynamicsModel(mesa.Model):
 
 		# Monitor matrices
 		self.opinion_dists 		= np.zeros(self.runtime + 1)			# array of wasserstein op dist
-		self.opinion_dists[-1]	= 1										# Circumvent main while loop first step
+		self.opinion_dists[-1]	= 1										# Circumvent main while loop first
 		self.opinion_hist		= np.zeros((self.runtime + 1, N))		# 2D matrix of opinions over runtime
 
 	def	gen_turnover(self):

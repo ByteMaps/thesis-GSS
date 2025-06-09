@@ -8,15 +8,18 @@ runtime = 50																					# 15 usually suffices
 
 runs = 1_000
 
+
 if __name__=="__main__":
 	print("Setting parameters")
 	params = Base()
 	print("Initiating loop")
-	for i in range(runs):
+	i = 258
+	while i < runs:
 		model = OpinionDynamicsModel(N, Individual, params, runtime, i)
 		category = model.run()
 		collect_results(model, i, category)
 		print(f"Run {model.modeltype}-{i} successful")
 		del model
+		i += 1
 		
 	print("\nProcess completed succesfully\n")
