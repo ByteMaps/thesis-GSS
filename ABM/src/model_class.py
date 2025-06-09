@@ -34,8 +34,7 @@ class OpinionDynamicsModel(mesa.Model):
 		self.Temp				= params.Temp
 
 		# GenT parameters
-		self.turnover_prob    = params.turnover_prob if self.modeltype == "GenT" else 0
-		self.turnover_tries    = params.turnover_tries if self.modeltype == "GenT" else 0
+		self.poisson_range	    = np.random.poisson(params.poisson_avg, size=runtime)
 
 		# Create agents
 		self.agents_by_id 		= {}									# Dict of agent objects accessible by unique_id
@@ -61,11 +60,10 @@ class OpinionDynamicsModel(mesa.Model):
 		agent.persuasiveness	= np.random.rand(1)
 		agent.link_row 			= np.zeros(self.N, dtype=int)
 
-	def turnover_check(self):																		# TODO consider adding Poisson
+	def turnover_check(self, i):
 		"""Attempt turnover_tries times to implement GenT"""
-		for _ in range(self.turnover_tries):
-			if np.random.rand() < self.turnover_prob:
-				self.gen_turnover()
+		for _ in range(self.poisson_range[i]):
+			self.gen_turnover()
 
 	def	agents_shuffle(self):
 		"""Randomise model events for AgentSet"""
@@ -74,7 +72,7 @@ class OpinionDynamicsModel(mesa.Model):
 		self.agents.shuffle_do("find_neighbours")
 		self.agents.shuffle_do("change_values", self.rate_valuechange, self.steps_valuechange)
 		self.agents.shuffle_do("change_opinion", self.Temp, self.dist_cd, self.tries_op_change)
-		for id, agent in self.agents_by_id.items():									# ? ugly, but looks like it works?
+		for id, agent in self.agents_by_id.items():													# ? ugly, but looks like it works?
 			self.opinions[id] = agent.opinion
 
 	def	run(self, savefigs=True):
@@ -88,9 +86,8 @@ class OpinionDynamicsModel(mesa.Model):
 			
 			self.agents_shuffle()
 
-			# Generational turnover checks
-			if self.modeltype == "GenT":
-				self.turnover_check()
+			# Generational turnover check
+			self.turnover_check(i)
 
 			# print(f"Step {i} - dist: {self.opinion_dists[i]}, Opinion std: {round(np.std(self.opinions),5)}")
 			i += 1
@@ -101,3 +98,5 @@ class OpinionDynamicsModel(mesa.Model):
 			self.final_cat = form_density_estimate(self.modeltype, self.opinions, self.modelrun, self.path, True)
 			visualise_network(self.modeltype, self.modelrun, self.N, self.opinions, \
 					 		self.link_matrix, self.final_cat, self.path, True)
+		else:
+			self.final_cat = form_density_estimate(self.modeltype, self.opinions, self.modelrun, self.path)

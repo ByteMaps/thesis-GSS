@@ -28,19 +28,16 @@ def	assign_categories(amt_peaks, opinions):
 	else:
 		return 3
 
-def	collect_results(model, modelrun):
+def	collect_results(Model, modelrun, poisson_lamb):
 	"""Collect statistics for each model round, pass it to CSV saver"""
-	OP_mean = round(np.mean(model.opinions), 5)
-	OP_variance = round(np.var(model.opinions), 5)
-	unity = np.sum(model.link_matrix) / 2
+	OP_mean = round(np.mean(Model.opinions), 5)
+	OP_variance = round(np.var(Model.opinions), 5)
+	unity = np.sum(Model.link_matrix) / 2
 
-	gen_turnover = model.turnover_prob
-	turnover_tries = model.turnover_tries
+	payload = (modelrun, Model.final_cat, OP_mean, OP_variance, unity, poisson_lamb)
+	save_as_csv(Model.path, "results.csv", payload)
 
-	payload = (modelrun, model.final_cat, OP_mean, OP_variance, unity, gen_turnover, turnover_tries)
-	save_as_csv(model.path, "results.csv", payload)
-
-def	save_as_csv(filepath, filename, data, headers=["modelrun", "category", "OPmean", "OPvariance", "unity", "GenT", "T_tries"]):
+def	save_as_csv(filepath, filename, data, headers=["modelrun", "category", "OPmean", "OPvariance", "unity", "GenTlambda"]):
 	"""Save data as a CSV file"""
 	makedirs(f"{filepath}", exist_ok=True)
 	file_exists = path.isfile(f"{filepath}{filename}")
@@ -50,3 +47,7 @@ def	save_as_csv(filepath, filename, data, headers=["modelrun", "category", "OPme
 		if not file_exists:
 			writer.writerow(headers)
 		writer.writerow(data)
+
+def	get_parameters(amt, max, min):
+	"""Get the parameter results over a specified interval"""
+	return np.linspace(min, max, amt)

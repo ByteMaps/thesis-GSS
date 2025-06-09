@@ -72,7 +72,7 @@ def	form_density_estimate(modeltype, opinions, model, path, savef=False):
 	if savef:
 		makedirs(f"{path}kde_plots", exist_ok=True)
 		plt.savefig(f"{path}kde_plots/{modeltype}_{model}-cat_{category}.png")
-	else:
-		plt.show()
+	# else:
+	# 	plt.show()
 	plt.close('all')
 	return category
