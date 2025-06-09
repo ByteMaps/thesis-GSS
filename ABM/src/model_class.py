@@ -13,6 +13,7 @@ class OpinionDynamicsModel(mesa.Model):
 		self.runtime			= runtime
 		self.modeltype			= type(params).__name__ 
 		self.link_matrix		= np.zeros((N,N), dtype=int)
+		self.path				= params.savepath
 
 		self.opinions			= np.random.uniform(-1,1,N)		# np array with generated opinions
 		self.values				= np.random.uniform(-1,1,N)		# np array with generated values
@@ -47,6 +48,8 @@ class OpinionDynamicsModel(mesa.Model):
 		self.opinion_dists[-1]	= 1										# Circumvent main while loop first
 		self.opinion_hist		= np.zeros((self.runtime + 1, N))		# 2D matrix of opinions over runtime
 
+		self.total_runs			= 0
+
 	def	gen_turnover(self):
 		"""Pick out a random agent and reset its params"""			# * Hendrickx & Martin, 2017
 		random_id = np.random.randint(0,self.N)
@@ -73,7 +76,7 @@ class OpinionDynamicsModel(mesa.Model):
 		for id, agent in self.agents_by_id.items():									# ? ugly, but looks like it works?
 			self.opinions[id] = agent.opinion
 
-	def	run(self):
+	def	run(self, savefigs=True):
 		"""Run through all agents to test functionality"""
 		i = 0
 		# form_density_estimate(self.modeltype, self.opinions, self.model)
@@ -90,8 +93,12 @@ class OpinionDynamicsModel(mesa.Model):
 
 			# print(f"Step {i} - dist: {self.opinion_dists[i]}, Opinion std: {round(np.std(self.opinions),5)}")
 			i += 1
+			self.total_runs += 1
 			self.opinion_hist[i] = self.opinions
 
-		category = form_density_estimate(self.modeltype, self.opinions, self.modelrun, True)
-		visualise_network(self.modeltype, self.modelrun, self.N, self.opinions, self.link_matrix, category, True)
-		return category
+		if savefigs:
+			category = form_density_estimate(self.modeltype, self.opinions, self.modelrun, self.path, True)
+			visualise_network(self.modeltype, self.modelrun, self.N, self.opinions, self.link_matrix, category, self.path, True)
+			return category
+		else:
+			return 0

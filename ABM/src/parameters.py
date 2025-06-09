@@ -15,12 +15,16 @@ class Base:
 		self.dist_cd				= 1
 		self.Temp					= 0.1
 
+		self.savepath				= "ABM/results/tests/"
+
 class GenT(Base):
 	def	__init__(self):
 		super().__init__()
 		self.birth_death_prob		= 0					# Simulating life cycle effects
 		self.migration_prob			= 0					# Simulating migration effects
 		self.turnover_tries			= 5					# Amount of turnover tries
+
+		self.savepath				= "ABM/results/gent_module/"
 
 if __name__=="__main__":
 	testparam = GenT()
