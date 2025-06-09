@@ -20,12 +20,11 @@ class Base:
 class GenT(Base):
 	def	__init__(self):
 		super().__init__()
-		self.birth_death_prob		= 0					# Simulating life cycle effects
-		self.migration_prob			= 0					# Simulating migration effects
-		self.turnover_tries			= 5					# Amount of turnover tries
+		self.turnover_prob			= 0.30
+		self.turnover_tries			= 5
 
 		self.savepath				= "ABM/results/gent_module/"
 
 if __name__=="__main__":
 	testparam = GenT()
-	print(testparam.max_nb)
+	print(testparam.savepath)

@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from os import makedirs, path
+from os import path, makedirs
 import csv
 
 def	measure_opdist(opdist):
@@ -28,20 +28,24 @@ def	assign_categories(amt_peaks, opinions):
 	else:
 		return 3
 
-def	collect_results(model, modelrun, category):
+def	collect_results(model, modelrun):
 	"""Collect statistics for each model round, pass it to CSV saver"""
 	OP_mean = round(np.mean(model.opinions), 5)
 	OP_variance = round(np.var(model.opinions), 5)
 	unity = np.sum(model.link_matrix) / 2
 
-	payload = (modelrun, category, OP_mean, OP_variance, unity)
-	save_as_csv("ABM/results/results.csv", payload)
+	gen_turnover = model.turnover_prob
+	turnover_tries = model.turnover_tries
 
-def	save_as_csv(filename, data, headers=["modelrun", "category", "OPmean", "OPvariance", "unity"]):
+	payload = (modelrun, model.final_cat, OP_mean, OP_variance, unity, gen_turnover, turnover_tries)
+	save_as_csv(model.path, "results.csv", payload)
+
+def	save_as_csv(filepath, filename, data, headers=["modelrun", "category", "OPmean", "OPvariance", "unity", "GenT", "T_tries"]):
 	"""Save data as a CSV file"""
-	file_exists = path.isfile(filename)
+	makedirs(f"{filepath}", exist_ok=True)
+	file_exists = path.isfile(f"{filepath}{filename}")
 	
-	with open(filename, 'a', newline='') as file:
+	with open(f"{filepath}{filename}", 'a', newline='') as file:
 		writer = csv.writer(file)
 		if not file_exists:
 			writer.writerow(headers)

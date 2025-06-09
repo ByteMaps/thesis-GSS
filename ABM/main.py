@@ -11,13 +11,14 @@ runs = 1_000
 
 if __name__=="__main__":
 	print("Setting parameters")
-	params = Base()
+	params = GenT()
 	print("Initiating loop")
 	i = 0
 	while i < runs:
 		model = OpinionDynamicsModel(N, Individual, params, runtime, i)
-		category = model.run(savefigs=True)
-		# collect_results(model, i, category)
+		model.run(savefigs=True)
+		collect_results(model, i)
+
 		print(f"Run {model.modeltype}-{i} successful with {model.total_runs}")
 		del model
 		i += 1

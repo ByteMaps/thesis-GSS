@@ -34,7 +34,7 @@ class OpinionDynamicsModel(mesa.Model):
 		self.Temp				= params.Temp
 
 		# GenT parameters
-		self.migration_prob    = params.migration_prob if self.modeltype == "GenT" else 0
+		self.turnover_prob    = params.turnover_prob if self.modeltype == "GenT" else 0
 		self.turnover_tries    = params.turnover_tries if self.modeltype == "GenT" else 0
 
 		# Create agents
@@ -49,6 +49,7 @@ class OpinionDynamicsModel(mesa.Model):
 		self.opinion_hist		= np.zeros((self.runtime + 1, N))		# 2D matrix of opinions over runtime
 
 		self.total_runs			= 0
+		self.final_cat			= "N"
 
 	def	gen_turnover(self):
 		"""Pick out a random agent and reset its params"""			# * Hendrickx & Martin, 2017
@@ -58,12 +59,12 @@ class OpinionDynamicsModel(mesa.Model):
 		agent.values			= np.random.uniform(-1,1,1)
 		agent.stubbornness		= np.random.rand(1)
 		agent.persuasiveness	= np.random.rand(1)
-		agent.link_row = 0
+		agent.link_row 			= np.zeros(self.N, dtype=int)
 
-	def turnover_check(self):
+	def turnover_check(self):																		# TODO consider adding Poisson
 		"""Attempt turnover_tries times to implement GenT"""
 		for _ in range(self.turnover_tries):
-			if np.random.rand() < self.migration_prob:
+			if np.random.rand() < self.turnover_prob:
 				self.gen_turnover()
 
 	def	agents_shuffle(self):
@@ -97,8 +98,6 @@ class OpinionDynamicsModel(mesa.Model):
 			self.opinion_hist[i] = self.opinions
 
 		if savefigs:
-			category = form_density_estimate(self.modeltype, self.opinions, self.modelrun, self.path, True)
-			visualise_network(self.modeltype, self.modelrun, self.N, self.opinions, self.link_matrix, category, self.path, True)
-			return category
-		else:
-			return 0
+			self.final_cat = form_density_estimate(self.modeltype, self.opinions, self.modelrun, self.path, True)
+			visualise_network(self.modeltype, self.modelrun, self.N, self.opinions, \
+					 		self.link_matrix, self.final_cat, self.path, True)
