@@ -49,6 +49,7 @@ def	save_as_csv(filepath, filename, data, headers=["Modelrun", "Category", "OPme
 		writer.writerow(data)
 
 def	read_counter(file="ABM/counter.txt"):
+	"""Get the current cycle num from textfile"""
 	if path.exists(file):
 		with open(file, 'r') as file:
 			return int(file.read())
@@ -56,6 +57,7 @@ def	read_counter(file="ABM/counter.txt"):
 		return 0
 	
 def	write_counter(index, file="ABM/counter.txt"):
+	"""Set the last full cycle num in textfile"""
 	if path.exists(file):
 		with open(file, 'w') as file:
 			file.write(str(index))

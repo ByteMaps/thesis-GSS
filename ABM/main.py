@@ -8,16 +8,15 @@ from sys import exit
 N = 100
 runtime = 50
 
-param_amt = 10
-sample = 1_000
+param_amt = 20
+sample = 100
 runs = param_amt * sample
 
-def	run_model(param, i):
+def	run_model(gent, i):
 	model = OpinionDynamicsModel(N, Individual, params, runtime, i)
-	model.run(savefigs=(i % 100 == 0), showfigs=False)
-	collect_results(model, i, poisson_pick)
-	print(f"{model.modeltype} {i} cat: {model.final_cat} ran with lambda: {poisson_pick} in {model.total_runs} runs")
-	del model
+	model.run(savefigs=(i % 10 == 0), showfigs=False)															# Save figures every 1/10 times
+	collect_results(model, i, gent)
+	print(f"{model.modeltype} {i} cat: {model.final_cat} ran with lambda: {gent} in {model.total_runs} runs")
 
 if __name__=="__main__":
 	print("Setting parameters")
@@ -25,6 +24,7 @@ if __name__=="__main__":
 	gent_set = np.linspace(0, 5, param_amt)
 	
 	i = read_counter()
+
 	print(f"Initiating loop at {i}")
 	try:
 		while i < runs:
@@ -37,4 +37,4 @@ if __name__=="__main__":
 		exit(0)
 
 	print(f"\nProgram succesfully terminated\n")
-		
+	write_counter(0)
