@@ -10,8 +10,6 @@ from scipy.signal import find_peaks
 
 from src.utils import *
 
-matplotlib.use('Agg')
-
 # ================ NETWORK GRAPH =======================================
 
 def	form_edges(N, link_matrix):
@@ -32,7 +30,7 @@ def	form_network(N, edges):
 	pos = nx.spring_layout(G2,seed=10)
 	return pos, cmap, G2
 
-def form_netw_chart(modeltype, model, N, category, opinions, cmap, G2, pos, path, savef):
+def form_netw_chart(modeltype, model, N, category, opinions, cmap, G2, pos, path, savefigs, showfigs):
 	"""Build the plot using matplotlib"""
 	plt.figure()
 	nx.draw_networkx_edges(G2, pos, alpha=0.4)
@@ -41,23 +39,23 @@ def form_netw_chart(modeltype, model, N, category, opinions, cmap, G2, pos, path
 	sm._A = []
 	cbar = plt.colorbar(sm, ax=plt.gca())
 	cbar.ax.tick_params(labelsize=15)
-	if savef:
+	if savefigs:
 		makedirs(f"{path}networkx", exist_ok=True)
 		plt.savefig(f"{path}networkx/{modeltype}_{model}-cat_{category}.png")
-	else:
+	if showfigs:
 		plt.show()
 	plt.close('all')
 
-def	visualise_network(modeltype, model, N, opinions, link_matrix, category, path, savef=False):
+def	visualise_network(modeltype, model, N, opinions, link_matrix, category, path, savefigs, showfigs):
 	"""Create a network plot based on a single model run"""
 	edges = form_edges(N, link_matrix)
 	pos, cmap, G2 = form_network(N, edges)
 
-	form_netw_chart(modeltype, model, N, category, opinions, cmap, G2, pos, path, savef)
+	form_netw_chart(modeltype, model, N, category, opinions, cmap, G2, pos, path, savefigs, showfigs)
 
 # ====================== OP_DIST GRAPH ======================================
 
-def	form_density_estimate(modeltype, opinions, model, path, savef=False):
+def	form_density_estimate(modeltype, opinions, model, path, savefigs, showfigs):
 	"""Build a kernel density plot based on the opinions data"""
 	plt.figure()
 	kde_plot = kdeplot(data=opinions)
@@ -69,10 +67,10 @@ def	form_density_estimate(modeltype, opinions, model, path, savef=False):
 
 	category = assign_categories(amt_peaks, opinions)
 	plt.title(f"Cat {category}")
-	if savef:
+	if savefigs:
 		makedirs(f"{path}kde_plots", exist_ok=True)
 		plt.savefig(f"{path}kde_plots/{modeltype}_{model}-cat_{category}.png")
-	# else:
-	# 	plt.show()
+	if showfigs:
+		plt.show()
 	plt.close('all')
 	return category

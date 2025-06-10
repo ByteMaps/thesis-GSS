@@ -20,7 +20,7 @@ class Base:
 class GenT(Base):
 	def	__init__(self):
 		super().__init__()
-		self.poisson_avg			= 0.1							# Range 0.1 to 10
+		self.poisson_avg			= 3							# Range 0.1 to 10
 
 		self.savepath				= "ABM/results/gent_module/"
 

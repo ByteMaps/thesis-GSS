@@ -50,20 +50,11 @@ class OpinionDynamicsModel(mesa.Model):
 		self.total_runs			= 0
 		self.final_cat			= "N"
 
-	def	gen_turnover(self):
-		"""Pick out a random agent and reset its params"""			# * Hendrickx & Martin, 2017
-		random_id = np.random.randint(0,self.N)
-		agent = self.agents_by_id[random_id]
-		agent.opinion			= np.random.uniform(-1,1,1)
-		agent.values			= np.random.uniform(-1,1,1)
-		agent.stubbornness		= np.random.rand(1)
-		agent.persuasiveness	= np.random.rand(1)
-		agent.link_row 			= np.zeros(self.N, dtype=int)
-
 	def turnover_check(self, i):
 		"""Attempt turnover_tries times to implement GenT"""
 		for _ in range(self.poisson_range[i]):
-			self.gen_turnover()
+			random_id = np.random.randint(0,self.N)
+			self.agents_by_id[random_id].gen_turnover(self.agents_by_id)
 
 	def	agents_shuffle(self):
 		"""Randomise model events for AgentSet"""
@@ -73,12 +64,13 @@ class OpinionDynamicsModel(mesa.Model):
 		self.agents.shuffle_do("change_values", self.rate_valuechange, self.steps_valuechange)
 		self.agents.shuffle_do("change_opinion", self.Temp, self.dist_cd, self.tries_op_change)
 		for id, agent in self.agents_by_id.items():													# ? ugly, but looks like it works?
-			self.opinions[id] = agent.opinion
+			self.opinions[id] = agent.opinion														# Update opinions matrix
 
-	def	run(self, savefigs=True):
+	def	run(self, savefigs=False, showfigs=False):
 		"""Run through all agents to test functionality"""
 		i = 0
-		# form_density_estimate(self.modeltype, self.opinions, self.model)
+		if not(showfigs):
+			matplotlib.use('Agg')																	# Prevent image generation
 
 		while (not(self.opinion_dists[i-1] < 0.003) and i < self.runtime):
 			self.opinion_hist[i] = self.opinions.copy()														# Update opinion matrix
@@ -94,9 +86,7 @@ class OpinionDynamicsModel(mesa.Model):
 			self.total_runs += 1
 			self.opinion_hist[i] = self.opinions
 
-		if savefigs:
-			self.final_cat = form_density_estimate(self.modeltype, self.opinions, self.modelrun, self.path, True)
+		if savefigs or showfigs:
+			self.final_cat = form_density_estimate(self.modeltype, self.opinions, self.modelrun, self.path, savefigs, showfigs)
 			visualise_network(self.modeltype, self.modelrun, self.N, self.opinions, \
-					 		self.link_matrix, self.final_cat, self.path, True)
-		else:
-			self.final_cat = form_density_estimate(self.modeltype, self.opinions, self.modelrun, self.path)
+					 		self.link_matrix, self.final_cat, self.path, savefigs, showfigs)

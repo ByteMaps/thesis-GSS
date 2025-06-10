@@ -34,10 +34,10 @@ def	collect_results(Model, modelrun, poisson_lamb):
 	OP_variance = round(np.var(Model.opinions), 5)
 	unity = np.sum(Model.link_matrix) / 2
 
-	payload = (modelrun, Model.final_cat, OP_mean, OP_variance, unity, poisson_lamb)
+	payload = (modelrun, Model.final_cat, OP_mean, OP_variance, unity, poisson_lamb, Model.total_runs)
 	save_as_csv(Model.path, "results.csv", payload)
 
-def	save_as_csv(filepath, filename, data, headers=["modelrun", "category", "OPmean", "OPvariance", "unity", "GenTlambda"]):
+def	save_as_csv(filepath, filename, data, headers=["Modelrun", "Category", "OPmean", "OPvariance", "Unity", "GenTlambda", "Runs"]):
 	"""Save data as a CSV file"""
 	makedirs(f"{filepath}", exist_ok=True)
 	file_exists = path.isfile(f"{filepath}{filename}")
@@ -48,6 +48,14 @@ def	save_as_csv(filepath, filename, data, headers=["modelrun", "category", "OPme
 			writer.writerow(headers)
 		writer.writerow(data)
 
-def	get_parameters(amt, max, min):
-	"""Get the parameter results over a specified interval"""
-	return np.linspace(min, max, amt)
+def	read_counter(file="ABM/savestate.txt"):
+	if path.exists(file):
+		with open(file, 'r') as file:
+			return int(file.read())
+	else:
+		return 0
+	
+def	write_counter(index, file="ABM/savestate.txt"):
+	if path.exists(file):
+		with open(file, 'w') as file:
+			file.write(str(index))

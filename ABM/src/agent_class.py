@@ -71,6 +71,17 @@ class Individual(mesa.Agent):
 				elif stub_random[i] < exp(-dH/T):
 					self.opinion = new_op
 
+	def	gen_turnover(self, all_agents):
+		"""Reset self parameters & re-establish in space"""
+		self.opinion				= np.random.uniform(-1,1,1)
+		self.values					= np.random.uniform(-1,1,1)
+		self.stubbornness			= np.random.rand(1)
+		self.persuasiveness			= np.random.rand(1)
+		self.link_row 				= np.zeros(self.model.N, dtype=int)
+
+		for _, agent in all_agents.items():
+			agent.link_row[self.unique_id] = 0
+
 
 	# def	_update_neighbour_opinions(self):
 	# 	"""Updates the self neighbour array values"""
