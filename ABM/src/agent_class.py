@@ -81,12 +81,3 @@ class Individual(mesa.Agent):
 
 		for _, agent in all_agents.items():
 			agent.link_row[self.unique_id] = 0
-
-
-	# def	_update_neighbour_opinions(self):
-	# 	"""Updates the self neighbour array values"""
-	# 	self.neighbour_ops = self.link_row * self.opinion
-
-	# def	_update_neighbour_op_distances(self):
-	# 	"""Updates the self neighbour distance array"""
-	# 	self.neighbour_dist = abs(self.opinion - self.neighbour_ops)

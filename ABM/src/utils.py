@@ -48,14 +48,14 @@ def	save_as_csv(filepath, filename, data, headers=["Modelrun", "Category", "OPme
 			writer.writerow(headers)
 		writer.writerow(data)
 
-def	read_counter(file="ABM/savestate.txt"):
+def	read_counter(file="ABM/counter.txt"):
 	if path.exists(file):
 		with open(file, 'r') as file:
 			return int(file.read())
 	else:
 		return 0
 	
-def	write_counter(index, file="ABM/savestate.txt"):
+def	write_counter(index, file="ABM/counter.txt"):
 	if path.exists(file):
 		with open(file, 'w') as file:
 			file.write(str(index))

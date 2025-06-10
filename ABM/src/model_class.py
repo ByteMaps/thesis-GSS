@@ -86,7 +86,6 @@ class OpinionDynamicsModel(mesa.Model):
 			self.total_runs += 1
 			self.opinion_hist[i] = self.opinions
 
-		if savefigs or showfigs:
-			self.final_cat = form_density_estimate(self.modeltype, self.opinions, self.modelrun, self.path, savefigs, showfigs)
-			visualise_network(self.modeltype, self.modelrun, self.N, self.opinions, \
+		self.final_cat = form_density_estimate(self.modeltype, self.opinions, self.modelrun, self.path, savefigs, showfigs)
+		visualise_network(self.modeltype, self.modelrun, self.N, self.opinions, \
 					 		self.link_matrix, self.final_cat, self.path, savefigs, showfigs)
