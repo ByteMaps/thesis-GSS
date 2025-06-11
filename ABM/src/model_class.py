@@ -83,7 +83,7 @@ class OpinionDynamicsModel(mesa.Model):
 			self.turnover_check(i)																								# Generational turnover check
 
 			if self.runtime > 100 and i % 10 == 0:																				# Check progress for longer runtimes
-				print(f"Step {i} - dist: {self.opinion_dists[i]}, Opinion std: {round(np.std(self.opinions),5)}")
+				print(f"Step {i} - avg dist: {round(np.mean(self.opinion_dists), 3)}, Opinion std: {round(np.std(self.opinions),3)}")
 
 			i += 1
 			self.total_runs += 1

@@ -6,9 +6,10 @@ import numpy as np
 from sys import exit
 
 #================================================ PARAMETERS ==================================================================
+#							'''For more parameter options check parameters.py'''
 
 saveto 				= "final"
-max_runtime				= 100
+max_runtime			= 100
 
 param_amt 			= 10
 sample 				= 100
@@ -18,7 +19,7 @@ runs 				= param_amt * sample
 
 def	run_model(poisson_pick, modelrun):
 	model = OpinionDynamicsModel(Individual, params, modelrun)
-	model.run(savefigs=(i % 10 == 0), showfigs=False)																			# Save figures every 1/10 times
+	model.run(savefigs=(i % 5 == 0), showfigs=False)																			# Save figures every 1/x times
 	collect_results(model, modelrun, poisson_pick)
 	print(f"{model.modeltype} {modelrun} cat: {model.final_cat} ran with lambda: {poisson_pick} in {model.total_runs} runs")
 
@@ -38,7 +39,7 @@ if __name__=="__main__":
 			i += 1
 	except KeyboardInterrupt:
 		write_counter(i)
-		print(f"Exiting safely at {i-1}")
+		print(f"Exiting safely at {i}, model not saved")
 		exit(0)
 
 	print(f"\nProgram succesfully terminated\n")
