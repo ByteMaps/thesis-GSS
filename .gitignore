@@ -187,3 +187,4 @@ Scripts/
 share/
 pyvenv.cfg
 results/
+ABM/counter.txt
