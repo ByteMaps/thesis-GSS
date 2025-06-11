@@ -12,21 +12,21 @@ def	measure_opdist(opdist):
 	plt.plot(y, opdist)
 	plt.show()
 
+
 def	assign_categories(amt_peaks, opinions):
 	"""Assign categories: If the opinion distribution has 
-	 - 1 peak and a low variance 	-->		consensus state, 
-	 - 1 peak and a high variance	-->		co-existence state, 
-	 - more than 2 peaks			-->		polarized state."""
+	 - 1 peak and a low variance 	-->		0. consensus state
+	 - 1 peak and a high variance	-->		1. co-existence state
+	 - 2+ peaks						-->		2. polarized state"""
 
 	if amt_peaks == 1:
 		if np.var(opinions) < 0.05:
 			return 0
 		else:
 			return 1
-	elif amt_peaks == 2:
-		return 2
 	else:
-		return 3
+		return 2
+
 
 def	collect_results(Model, modelrun, poisson_lamb):
 	"""Collect statistics for each model round, pass it to CSV saver"""
@@ -36,6 +36,7 @@ def	collect_results(Model, modelrun, poisson_lamb):
 
 	payload = (modelrun, Model.final_cat, OP_mean, OP_variance, unity, poisson_lamb, Model.total_runs)
 	save_as_csv(Model.path, "results.csv", payload)
+
 
 def	save_as_csv(filepath, filename, data, headers=["Modelrun", "Category", "OPmean", "OPvariance", "Unity", "GenTlambda", "Runs"]):
 	"""Save data as a CSV file"""
@@ -48,6 +49,7 @@ def	save_as_csv(filepath, filename, data, headers=["Modelrun", "Category", "OPme
 			writer.writerow(headers)
 		writer.writerow(data)
 
+
 def	read_counter(file="ABM/counter.txt"):
 	"""Get the current cycle num from textfile"""
 	if path.exists(file):
@@ -55,7 +57,8 @@ def	read_counter(file="ABM/counter.txt"):
 			return int(file.read())
 	else:
 		return 0
-	
+
+
 def	write_counter(index, file="ABM/counter.txt"):
 	"""Set the last full cycle num in textfile"""
 	if path.exists(file):

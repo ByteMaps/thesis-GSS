@@ -5,20 +5,20 @@ from src.visualisation import *
 from src.utils import *
 
 class OpinionDynamicsModel(mesa.Model):
-	"""A model with some number of agents."""
-	def __init__(self, N, Agent, params, runtime, model=0):
+
+	def __init__(self, Agent, params, model=0):
 		super().__init__()
-		self.N 					= N								# Amount of agents
-		self.modelrun			= model							# Model id
-		self.runtime			= runtime
+		self.N 					= params.N							# Amount of agents
+		self.modelrun			= model								# Model id
+		self.runtime			= params.runtime
 		self.modeltype			= type(params).__name__ 
-		self.link_matrix		= np.zeros((N,N), dtype=int)
+		self.link_matrix		= np.zeros((self.N,self.N), dtype=int)
 		self.path				= params.savepath
 
-		self.opinions			= np.random.uniform(-1,1,N)		# np array with generated opinions
-		self.values				= np.random.uniform(-1,1,N)		# np array with generated values
-		self.stubbornness		= np.random.rand(N)
-		self.persuasiveness		= np.random.rand(N)
+		self.opinions			= np.random.uniform(-1,1,self.N)		# np array with generated opinions
+		self.values				= np.random.uniform(-1,1,self.N)		# np array with generated values
+		self.stubbornness		= np.random.rand(self.N)
+		self.persuasiveness		= np.random.rand(self.N)
 
 		# Base parameters
 		self.dist_removelink 	= params.dist_removelink
@@ -34,7 +34,7 @@ class OpinionDynamicsModel(mesa.Model):
 		self.Temp				= params.Temp
 
 		# GenT parameters
-		self.poisson_range	    = np.random.poisson(params.poisson_avg, size=runtime)
+		self.poisson_range	    = np.random.poisson(params.poisson_avg, size=self.runtime)
 
 		# Create agents
 		self.agents_by_id 		= {}									# Dict of agent objects accessible by unique_id
@@ -43,18 +43,21 @@ class OpinionDynamicsModel(mesa.Model):
 			self.agents_by_id[id] = agent
 
 		# Monitor matrices
-		self.opinion_dists 		= np.zeros(self.runtime + 1)			# array of wasserstein op dist
+		self.opinion_dists 		= np.zeros(10)							# array of wasserstein op dist
 		self.opinion_dists[-1]	= 1										# Circumvent main while loop first
-		self.opinion_hist		= np.zeros((self.runtime + 1, N))		# 2D matrix of opinions over runtime
+		self.opinion_hist		= np.zeros(self.N)						# 1D matrix of last opinions
 
 		self.total_runs			= 0
 		self.final_cat			= "N"
 
+
 	def turnover_check(self, i):
 		"""Attempt turnover_tries times to implement GenT"""
+
 		for _ in range(self.poisson_range[i]):
 			random_id = np.random.randint(0,self.N)
 			self.agents_by_id[random_id].gen_turnover(self.agents_by_id)
+
 
 	def	agents_shuffle(self):
 		"""Randomise model events for AgentSet"""
@@ -66,25 +69,27 @@ class OpinionDynamicsModel(mesa.Model):
 		for id, agent in self.agents_by_id.items():													# ? ugly, but looks like it works?
 			self.opinions[id] = agent.opinion														# Update opinions matrix
 
+
 	def	run(self, savefigs=False, showfigs=False):
 		"""Run through all agents to test functionality"""
 		i = 0
 		if not(showfigs):
-			matplotlib.use('Agg')																	# Prevent image generation
+			matplotlib.use('Agg')																								# Prevent image generation
 
-		while (not(self.opinion_dists[i-1] < 0.003) and i < self.runtime):
-			self.opinion_hist[i] = self.opinions.copy()														# Update opinion matrix
-			self.opinion_dists[i] = round(wasserstein_distance(self.opinion_hist[i - 1], self.opinions),5)
+		while (not(all(self.opinion_dists < 0.003)) and i < self.runtime):
 			
 			self.agents_shuffle()
 
-			# Generational turnover check
-			self.turnover_check(i)
+			self.turnover_check(i)																								# Generational turnover check
 
-			# print(f"Step {i} - dist: {self.opinion_dists[i]}, Opinion std: {round(np.std(self.opinions),5)}")
+			if self.runtime > 100 and i % 10 == 0:																				# Check progress for longer runtimes
+				print(f"Step {i} - dist: {self.opinion_dists[i]}, Opinion std: {round(np.std(self.opinions),5)}")
+
 			i += 1
 			self.total_runs += 1
-			self.opinion_hist[i] = self.opinions
+			self.opinion_dists[:-1] = self.opinion_dists[1::]
+			self.opinion_dists[-1] = round(wasserstein_distance(self.opinion_hist, self.opinions),5)							# Calc distance
+			self.opinion_hist = self.opinions.copy()
 
 		self.final_cat = form_density_estimate(self.modeltype, self.opinions, self.modelrun, self.path, savefigs, showfigs)
 		visualise_network(self.modeltype, self.modelrun, self.N, self.opinions, \
