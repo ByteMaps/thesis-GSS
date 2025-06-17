@@ -79,11 +79,9 @@ class OpinionDynamicsModel(mesa.Model):
 		while (not(all(self.opinion_dists < 0.003)) and i < self.runtime):
 			
 			self.agents_shuffle()
-
 			self.turnover_check(i)																								# Generational turnover check
-
 			if self.runtime > 100 and i % 10 == 0:																				# Check progress for longer runtimes
-				print(f"Step {i} - avg dist: {round(np.mean(self.opinion_dists), 3)}, Opinion std: {round(np.std(self.opinions),3)}")
+				print(f"Step {i} - dist: {round(np.mean(self.opinion_dists), 3)}, Opinion std: {round(np.std(self.opinions),3)}")
 
 			i += 1
 			self.total_runs += 1

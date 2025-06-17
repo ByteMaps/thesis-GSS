@@ -4,38 +4,51 @@ from src.parameters import GenT
 from src.utils import collect_results, read_counter, write_counter
 import numpy as np
 from sys import exit
+import psutil, datetime, time
 
 #================================================ PARAMETERS ==================================================================
 #							'''For more parameter options check parameters.py'''
 
-saveto 				= "final"
+saveto 				= "extra"
 max_runtime			= 100
 
-param_amt 			= 10
+param_amt 			= 10																	# Amount of different parameters to run
 sample 				= 100
-runs 				= param_amt * sample
+# poisson_set 		= np.linspace(0, 1, param_amt + 1)
+runs 				= 100 * sample
 
 #================================================ PARAMETERS ==================================================================
 
-def	run_model(poisson_pick, modelrun):
+def	run_model(params, modelrun):
 	model = OpinionDynamicsModel(Individual, params, modelrun)
-	model.run(savefigs=(i % 5 == 0), showfigs=False)																			# Save figures every 1/x times
-	collect_results(model, modelrun, poisson_pick)
-	print(f"{model.modeltype} {modelrun} cat: {model.final_cat} ran with lambda: {poisson_pick} in {model.total_runs} runs")
+	model.run(savefigs=(i % 20 == 0), showfigs=False)																			# Save figures every 1/5 times
+	collect_results(model, modelrun, params.poisson_avg)
+	print(f"{model.modeltype} {modelrun} cat: {model.final_cat} ran with lambda: {params.poisson_avg} in {model.total_runs} runs")
+
+def	check_usage(filepath):
+	if not hasattr(psutil, "sensors_battery"):
+		pass
+	
+	cpu_usage = psutil.cpu_percent(interval=1)
+	timestamp = datetime.datetime.now().strftime("%d/%m/%Y - %H:%M:%S")
+
+	with open(filepath, 'a') as file:
+		file.write(f"{timestamp} ---- {cpu_usage}%\n")
 
 
 if __name__=="__main__":
 	print("Setting parameters")
 	params = GenT(runtime=max_runtime, path=saveto)
-	poisson_set = np.linspace(0, 5, param_amt + 1)
 	
 	i = read_counter()
 
 	print(f"Initiating loop at {i}")
 	try:
 		while i < runs:
-			poisson_pick = round(poisson_set[i // sample], 3)
-			run_model(poisson_pick, i)
+			poisson_pick = round(np.random.random(),3) #round(poisson_set[i // sample], 3)
+			params.poisson_avg = poisson_pick
+			run_model(params, i)
+			check_usage('usage.csv')
 			i += 1
 	except KeyboardInterrupt:
 		write_counter(i)
@@ -44,3 +57,4 @@ if __name__=="__main__":
 
 	print(f"\nProgram succesfully terminated\n")
 	write_counter(0)
+	exit(1)
